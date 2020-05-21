@@ -1,6 +1,6 @@
 const supertest = require('supertest');
-
 const server = require('./server');
+const Hobbits = require('../hobbits/hobbitsModel')
 const db = require('../data/db-config');
 
 afterEach(async () => {
@@ -12,33 +12,48 @@ describe('server', () => {
     expect(true).toBeTruthy();
   })
 
-  // describe('GET /', () =>{
-  //   it('should return http status code 200 OK', () => {
-  //     return supertest(server)
-  //       .get('/')
-  //       .then(res => {
-  //       expect(res.status).toBe(200);
-  //     })
-  //   })
+  describe('post new hobbit to /hobbits', () => {
+    it('should return new hobbit obj', async () => {
+      await Hobbits.add({name: 'devin'})
 
-  //   it('should return {api:up}', () => {
-  //     return supertest(server)
-  //       .get('/')
-  //       .then(res => {
-  //         expect(res.body).toEqual({ api: 'up'})
-  //         expect(res.body.api).toBeDefined()
-  //         expect(res.body.api).toBe('up')
-  //       })
-  //   })
+      const hobbits = await db('hobbits');
 
-    
-  //   describe('get /hobbits', () => {
-  //     it('should return an array', () => {
-  //       return supertest(server).get('/hobbits').then(res => {
-  //         expect(res.body).toHaveLength(0)
-  //       })
-  //     })
+      expect(hobbits).toHaveLength(1);
+    })
+  })
 
-  //   })
-  // })
+  describe('status code should be 201', () => {
+    it('should return status code 201', async () => {
+      const res = await supertest(server).post('/hobbits').send({ name: 'jonny '})
+      
+      expect(res.status).toBe(201)
+    })
+  })
+
+  describe('remove guy from database', () => {
+    it('remove a guy from the database', async () => {
+      await Hobbits.add({name: 'devin'})
+      return (
+        supertest(server)
+          .delete('/hobbits/1')
+          .then(res => {
+            expect(res.status).toBe(200)
+          })
+      )
+    })
+  })
+
+  describe('get 404 not found status', () => {
+    it('get 404 not found', () => {
+      return (
+        supertest(server)
+        .delete('/hobbits/2')
+        .then(res => {
+          expect(res.status).toBe(404)
+        })
+      )
+    })
+  })
+
 })
+

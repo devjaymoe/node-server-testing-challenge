@@ -1,23 +1,22 @@
 const db = require('../data/db-config');
 
 module.exports = {
-  insert,
-  update,
+  add,
   remove,
   getAll,
   findById,
 };
 
-async function insert(hobbit) {
-  return null;
-}
-
-async function update(id, changes) {
-  return null;
+async function add(hobbit) {
+  return db('hobbits')
+    .insert(hobbit, "id")
+    .then(ids => {
+      return findById(ids[0])
+    })
 }
 
 function remove(id) {
-  return null;
+  return db('hobbits').where({ id }).del();
 }
 
 function getAll() {
@@ -25,5 +24,5 @@ function getAll() {
 }
 
 function findById(id) {
-  return null;
+  return db("hobbits").where({ id }).first();
 }
